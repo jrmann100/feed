@@ -1,30 +1,59 @@
 <script>
-	export let name;
+  import { onMount } from "svelte";
+  import { loadAssignments } from "./assignments.js";
+  import Omni from "./Omni.svelte";
+  import Time from "./Time.svelte";
+  import Settings from "./Settings.svelte";
+  import TaskList from "./TaskList.svelte";
+
+  import {
+    profileName,
+    profileIcon,
+  } from "./userdata.js";
+
+
+  let menuVisible;
+  let menuButton;
+
+  onMount(loadAssignments);
+
+  let activateOmnibox;
+
+  const handleKeydown = (ev) => {
+    if (ev.key == "/" && activateOmnibox && !menuVisible) {
+      ev.preventDefault();
+      activateOmnibox();
+    }
+  };
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
-
 <style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+  .menu-button {
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    top: 1.5rem;
+    right: 1.5rem;
+    background-color: var(--white);
+    background-image: var(--profile-icon);
+    background-size: contain;
+    border-radius: 1rem;
+    border: 0.2rem solid var(--white);
+    cursor: pointer;
+  }
 </style>
+
+<div
+  class="menu-button"
+  bind:this={menuButton}
+  on:click={() => (menuVisible = !menuVisible)}
+  style="--profile-icon:url({$profileIcon})"
+  alt={$profileName} />
+
+<svelte:body on:keydown={handleKeydown} />
+<Settings bind:visible={menuVisible} bind:button={menuButton} />
+<Omni bind:trigger={activateOmnibox} />
+<Time />
+<TaskList/>
+<br />
+<!-- There's some background glitch when the TaskList is at the very bottom. Should add a footer anyway. -->
