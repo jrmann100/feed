@@ -92,6 +92,10 @@
     stroke: var(--white);
   }
 
+  .complete[completed="-1"] svg path, .complete[completed="1"] {
+    stroke: var(--white);
+  }
+
   .complete[completed="-1"] {
     border-color: lightsalmon;
     background-color: lightsalmon;

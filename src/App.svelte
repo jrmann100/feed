@@ -6,11 +6,7 @@
   import Settings from "./Settings.svelte";
   import TaskList from "./TaskList.svelte";
 
-  import {
-    profileName,
-    profileIcon,
-  } from "./userdata.js";
-
+  import { profileName, profileIcon } from "./userdata.js";
 
   let menuVisible;
   let menuButton;
@@ -38,7 +34,7 @@
     background-image: var(--profile-icon);
     background-size: contain;
     border-radius: 1rem;
-    border: 0.2rem solid var(--white);
+    border: 0.2rem solid var(--whiter);
     cursor: pointer;
   }
 </style>
@@ -52,8 +48,10 @@
 
 <svelte:body on:keydown={handleKeydown} />
 <Settings bind:visible={menuVisible} bind:button={menuButton} />
+<br />
+<!-- Couldn't figure out how to add padding without stretching a body, so we've got a <br> -->
 <Omni bind:trigger={activateOmnibox} />
-<Time />
-<TaskList/>
+<!-- <Time /> -->
+<TaskList />
 <br />
 <!-- There's some background glitch when the TaskList is at the very bottom. Should add a footer anyway. -->

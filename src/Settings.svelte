@@ -25,27 +25,18 @@
     right: 10%;
     max-height: 60%;
     background-color: var(--white);
-    color: var(--black);
     opacity: 0;
     transition: visibility 0s 0.2s, left 0s 0.2s, top 0s 0.2s,
       max-height 0s 0.2s, right 0s 0.4s, border-radius 0.2s, opacity 0.2s;
     border-radius: 2rem;
     visibility: hidden;
-    box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.2),
-      0 1rem 2rem rgba(0, 0, 0, 0.2);
+    box-shadow: var(--module-shadow);
     padding: 2rem;
     overflow: scroll;
-    border: 0.5rem solid var(--white);
+    border: 0.2rem solid var(--whiter);
     z-index: 2;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .wrapper {
-      background-color: var(--darker);
-      border: 0.2rem solid var(--white);
-      color: var(--white);
-    }
-  }
   .wrapper.visible {
     top: 10%;
     left: 10%;
@@ -141,7 +132,7 @@
 
   input[type="button"]:hover {
     background-color: royalblue;
-    color: var(--white);
+    color: var(--whiter);
   }
 
   hr {

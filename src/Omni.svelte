@@ -58,23 +58,23 @@
     width: 30rem;
     max-width: 90vw;
     background-color: transparent;
-    border: 0.2rem solid var(--white);
-    color: var(--white);
+    border: 0.2rem solid var(--whiter);
+    color: var(--whiter);
     transition: background-color 0.2s;
   }
 
   input:focus {
-    color: var(--black);
-    background-color: var(--white);
+    color: var(--darker);
+    background-color: var(--whiter);
   }
 
   input::placeholder {
-    color: var(--white);
+    color: var(--whiter);
     opacity: 1;
   }
 
   input.error {
-    background-color: var(--white);
+    background-color: var(--whiter);
   }
 
   input.error::placeholder {

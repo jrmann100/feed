@@ -30,7 +30,7 @@
     align-items: center;
     margin-top: 2rem;
     flex-direction: column;
-    color: var(--white);
+    color: var(--whiter);
   }
 
   .time-module .time {
@@ -38,7 +38,7 @@
   }
 
   .time-module .progress {
-    stroke: var(--white);
+    stroke: var(--whiter);
     width: 20rem;
     max-width: 90vw;
     border-radius: 0.2rem;

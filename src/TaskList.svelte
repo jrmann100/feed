@@ -10,8 +10,7 @@
   $: if ($taskItems.length > 0 && wrapper) {
     animated = loading = true;
     wrapper.style.height =
-      wrapper.querySelector(".content").getBoundingClientRect().height +
-      "px";
+      wrapper.querySelector(".content").getBoundingClientRect().height + "px";
     setTimeout(() => (loading = false), 5000);
   }
 </script>
@@ -27,7 +26,13 @@
     transition: height 0.2s 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
     position: relative;
     height: 5rem;
-    overflow: hidden;
+    box-shadow: var(--module-shadow);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .wrapper {
+      border: 0.2rem solid var(--whiter);
+    }
   }
 
   .mask {
@@ -104,6 +109,15 @@
       opacity: 0;
       visibility: visible;
     }
+  }
+
+  .wrapper {
+    overflow: scroll;
+    /* Should this scroll, or expand to fit content? */
+  }
+
+  .wrapper.animated.loading {
+    overflow: hidden;
   }
 
   .content::before {
