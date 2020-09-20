@@ -12,3 +12,8 @@ Feed is designed to simplify the process of managing a variety of learning resou
 * It has **extensibility** through clear APIs written in Svelte.
 
 *This README is a work in progress; I deleted the first draft on accident, which was much more detailed. -Jordan*
+
+## I know it's not ready, but I want to try it.
+
+Cool. Make sure you have `npm` installed, then download or clone this repository.
+Run `npm install` and then `npm run dev`. This will give you the URL to a test server running locally.
