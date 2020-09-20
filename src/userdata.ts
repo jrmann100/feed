@@ -13,6 +13,16 @@ export const profileGoogleSignout = () => {
     profileIcon.set(default_icon);
 }
 
+export class Link {
+    name: string;
+    url: string;
+}
+
+export class Bookmark {
+    links: typeof Link[];
+    aliases: string[];
+}
+
 profileName.subscribe(value => localStorage.setItem("profileName", value));
 profileIcon.subscribe(value => localStorage.setItem("profileIcon", value));
 profileBookmarks.subscribe(value => localStorage.setItem("profileBookmarks", JSON.stringify(value)));
@@ -23,7 +33,7 @@ export const profileAliases = derived(profileBookmarks, $profileBookmarks =>
     // Convert a 2D array to a 1D array.
     [].concat(
         // Turn every bookmark into a (key, value) pair matching 2D items with 1D parent indexes.
-        ...$profileBookmarks.map((bookmark, bookmarkIndex) =>
+        ...$profileBookmarks.map((bookmark: Bookmark, bookmarkIndex: number) =>
             bookmark.aliases.map(alias => [alias, bookmarkIndex])))
         // Convert (key, value) arrays into properties.
         .reduce((acc, keyval) => acc = { ...acc, [keyval[0]]: keyval[1] }, {}))

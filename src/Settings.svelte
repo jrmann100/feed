@@ -1,18 +1,18 @@
-<script>
+<script lang="ts">
   import {
     profileBookmarks,
     profileAliases,
     profileCanvasURL,
     profileName
   } from "./userdata.js";
-  export let visible;
-  export let wrapper;
-  export let button;
+  export let visible: boolean = false;
+  export let wrapper: HTMLDivElement = undefined;
+  export let button: HTMLButtonElement = undefined;
 
   import { googleChangeSignIn, loadAssignments } from "./assignments.js";
 
   // This causes the window to scroll jump to the new bookmark while it's trying to do smooth scrolling, which is jarring.
-  const focus = (el) => {
+  const focus = (el: HTMLElement) => {
     el.focus();
   };
 </script>

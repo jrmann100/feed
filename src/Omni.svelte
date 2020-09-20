@@ -1,9 +1,9 @@
-<script>
-  import { profileBookmarks, profileAliases } from "./userdata.js";
-  let div, content;
+<script lang="ts">
+  import { profileBookmarks, profileAliases, Link } from "./userdata";
+  let div: HTMLDivElement, content: string;
   let error = "";
 
-  export const showError = (text) => {
+  export const showError = (text: string) => {
     if (div) {
       error = text;
       setTimeout(() => {
@@ -12,13 +12,13 @@
     }
   };
 
-  export const trigger = (ev) => {
+  export const trigger = (ev: Event) => {
     if (div) {
       div.focus();
     }
   };
 
-  const keydown = (ev) => {
+  const keydown = (ev: KeyboardEvent) => {
     if (ev.key == "Enter") {
       ev.preventDefault();
       let command = content.toLowerCase().split(" ");
@@ -29,7 +29,7 @@
       }
       if (Object.keys($profileAliases).includes(command[1])) {
         let linkIndex = $profileBookmarks[$profileAliases[command[1]]].links
-          .map((link) => link.name)
+          .map((link: Link) => link.name)
           .indexOf(command[0]);
         if (linkIndex != -1) {
           window.open(

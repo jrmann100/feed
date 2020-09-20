@@ -1,5 +1,5 @@
-<script>
-  import { taskItems } from "./assignments.js";
+<script lang="ts">
+  import { taskItems } from "./assignments";
   import Task from "./Task.svelte";
 
   let wrapper;

@@ -3,11 +3,11 @@ import {
     profileIcon,
     profileGoogleSignout,
     profileCanvasURL
-} from "./userdata.js";
+} from "./userdata";
 
 import { get, writable } from 'svelte/store';
 
-const search = (A, T) => {
+const search = (A: number[], T: number) => {
     let L = 0;
     let R = A.length - 1;
     while (L <= R) {
@@ -22,7 +22,14 @@ const search = (A, T) => {
 export const taskItems = writable([]);
 
 export const Item = class {
-    constructor(name, className, description, url, date, completed = -1) {
+    name: string;
+    className: string;
+    description: string;
+    url: string;
+    date: Date;
+    completed: number;
+
+    constructor(name: string, className: string, description: string, url: string, date: Date, completed: number = -1) {
         this.name = name;
         this.className = className;
         this.description = description;
@@ -41,7 +48,7 @@ export const Item = class {
     }
 };
 
-let googleAuth;
+let gapi: any;
 
 const setupGAPI = () => {
     gapi.client
@@ -59,9 +66,8 @@ const setupGAPI = () => {
         })
         .then(
             () => {
-                googleAuth = gapi.auth2.getAuthInstance();
-                googleAuth.isSignedIn.listen(updateSigninStatus);
-                updateSigninStatus(googleAuth.isSignedIn.get());
+                gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+                updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
             },
             (error) => {
                 console.error(JSON.stringify(error, null, 2));
@@ -69,9 +75,9 @@ const setupGAPI = () => {
         );
 };
 
-const updateSigninStatus = (isSignedIn) => {
+const updateSigninStatus = (isSignedIn: boolean) => {
     if (isSignedIn) {
-        let profile = googleAuth.currentUser.get().getBasicProfile();
+        let profile = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile();
         if (profile.getName() != get(profileName)) {
             profileName.set(profile.getName());
             profileIcon.set(profile.getImageUrl());
@@ -83,12 +89,12 @@ const updateSigninStatus = (isSignedIn) => {
     }
 }
 
-export const googleChangeSignIn = () => ((auth2) => auth2.isSignedIn.get() ? auth2.signOut() : auth2.signIn()).call(undefined, gapi.auth2.getAuthInstance());
+export const googleChangeSignIn = () => (() => gapi.auth2.getAuthInstance().isSignedIn.get() ? gapi.auth2.getAuthInstance().signOut() : gapi.auth2.getAuthInstance().signIn());
 
 const setupClassroom = async () => {
     const allCourses = await gapi.client.classroom.courses.list();
     const currCourses = allCourses.result.courses.filter(
-        (course) => course.courseState != "ARCHIVED"
+        (course: any) => course.courseState != "ARCHIVED"
     );
     const assignmentGroups = (
         await Promise.all(
@@ -162,10 +168,11 @@ const setupClassroom = async () => {
 };
 
 const setupICAL = async () => {
+    const ICAL: any = (window as any).ICAL;
     const response = await fetch(
         new Request(
             "https://cors-anywhere.herokuapp.com/" +
-            ((url) => url.hostname + url.pathname).call(undefined, new URL(get(profileCanvasURL))),
+            ((url: URL) => url.hostname + url.pathname).call(undefined, new URL(get(profileCanvasURL))),
             {
                 mode: "cors",
             }
@@ -185,9 +192,9 @@ const setupICAL = async () => {
     console.log(
         `Loaded ${canvasItems.length} Canvas assignments: `,
         canvasItems.map(
-            (item) => (item.getFirstPropertyValue("summary").match(/.+?(?= \()/) ||
-            item.getFirstPropertyValue("summary").match(/.+?(?= \[)/))[0]
-    ));
+            (item: any) => (item.getFirstPropertyValue("summary").match(/.+?(?= \()/) ||
+                item.getFirstPropertyValue("summary").match(/.+?(?= \[)/))[0]
+        ));
 
     // This is broken in Safari.
     const assembleCanvasURL = (url) => {
@@ -199,16 +206,14 @@ const setupICAL = async () => {
             url.match(/(?<=assignment_)[0-9]*/)
         );
     };
-    window.item = canvasItems[0];
 
     canvasItems
         .filter(
-            (item) =>
+            (item: any) =>
                 new Date().getTime() <=
                 item.getFirstPropertyValue("dtstart").toJSDate().getTime()
         )
-        .forEach((item) => {
-            window.item = item;
+        .forEach((item: any) => {
             new Item(
                 (item.getFirstPropertyValue("summary").match(/.+?(?= \()/) ||
                     item.getFirstPropertyValue("summary").match(/.+?(?= \[)/))[0],
@@ -225,10 +230,9 @@ const setupICAL = async () => {
         });
 };
 
-const loadScript = (src) => {
+const loadScript = (src: string) => {
     return new Promise(function (resolve, reject) {
-        let s;
-        s = document.createElement("script");
+        let s: HTMLScriptElement = document.createElement("script");
         s.src = src;
         s.onload = resolve;
         s.onerror = reject;
@@ -239,7 +243,8 @@ const loadScript = (src) => {
 export const loadAssignments = () => {
     taskItems.set([]);
     loadScript("https://unpkg.com/ical.js@1.4.0/build/ical.js").then(setupICAL);
-    loadScript("https://apis.google.com/js/api:client.js").then(() =>
-        gapi.load("auth2", setupGAPI)
+    loadScript("https://apis.google.com/js/api:client.js").then(() => {
+        gapi = (window as any).gapi; gapi.load("auth2", setupGAPI);
+    }
     );
 }

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { loadAssignments } from "./assignments.js";
   import Omni from "./Omni.svelte";
@@ -8,14 +8,14 @@
 
   import { profileName, profileIcon } from "./userdata.js";
 
-  let menuVisible;
-  let menuButton;
+  let menuVisible: boolean;
+  let menuButton: HTMLDivElement;
 
   onMount(loadAssignments);
 
   let activateOmnibox;
 
-  const handleKeydown = (ev) => {
+  const handleKeydown = (ev: KeyboardEvent) => {
     if (ev.key == "/" && activateOmnibox && !menuVisible) {
       ev.preventDefault();
       activateOmnibox();
