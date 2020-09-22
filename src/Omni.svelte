@@ -1,24 +1,30 @@
-<script>
-  import { profileBookmarks, profileAliases } from "./userdata.js";
-  let div, content;
+<script lang="ts">
+  import { profileBookmarks, profileAliases, Link } from "./userdata";
+  /** The current value of the omnibox. */
+  let content: string;
+  /** The message to display in the omnibox if there is an input error. */
   let error = "";
 
-  export const showError = (text) => {
-    if (div) {
+  /** The search box. */
+  let input: HTMLInputElement;
+
+  /** Show the error text for three seconds. */
+  export const showError = (text: string) => {
+    if (input) {
       error = text;
-      setTimeout(() => {
-        error = "";
-      }, 3000);
+      setTimeout(() => (error = ""), 3000);
     }
   };
 
-  export const trigger = (ev) => {
-    if (div) {
-      div.focus();
+  /** Upon (external) activation, focus within the omnibox. */
+  export const trigger = (ev: Event) => {
+    if (input) {
+      input.focus();
     }
   };
 
-  const keydown = (ev) => {
+  /** On returning a command (pressing enter). */
+  const keydown = (ev: KeyboardEvent) => {
     if (ev.key == "Enter") {
       ev.preventDefault();
       let command = content.toLowerCase().split(" ");
@@ -27,7 +33,9 @@
         showError("Enter a command in the format [link] [alias].");
         return;
       }
+      // First check that the bookmark exists...
       if (Object.keys($profileAliases).includes(command[1])) {
+        // ...then check that the link exists.
         let linkIndex = $profileBookmarks[$profileAliases[command[1]]].links
           .map((link) => link.name)
           .indexOf(command[0]);
@@ -84,7 +92,7 @@
 
 <input
   type="text"
-  bind:this={div}
+  bind:this={input}
   class:error={error != ''}
   bind:value={content}
   on:keydown={keydown}

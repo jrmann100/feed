@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { loadAssignments } from "./assignments.js";
   import Omni from "./Omni.svelte";
@@ -8,14 +8,14 @@
 
   import { profileName, profileIcon } from "./userdata.js";
 
-  let menuVisible;
-  let menuButton;
+  let menuVisible: boolean;
+  let menuButton: HTMLDivElement;
 
   onMount(loadAssignments);
 
-  let activateOmnibox;
+  let activateOmnibox: Function;
 
-  const handleKeydown = (ev) => {
+  const handleKeydown = (ev: KeyboardEvent) => {
     if (ev.key == "/" && activateOmnibox && !menuVisible) {
       ev.preventDefault();
       activateOmnibox();
@@ -51,7 +51,7 @@
 <br />
 <!-- Couldn't figure out how to add padding without stretching a body, so we've got a <br> -->
 <Omni bind:trigger={activateOmnibox} />
-<!-- <Time /> -->
+<Time />
 <TaskList />
 <br />
 <!-- There's some background glitch when the TaskList is at the very bottom. Should add a footer anyway. -->

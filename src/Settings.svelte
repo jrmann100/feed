@@ -1,18 +1,29 @@
-<script>
+<script lang="ts">
   import {
     profileBookmarks,
     profileAliases,
     profileCanvasURL,
     profileName
-  } from "./userdata.js";
-  export let visible;
-  export let wrapper;
-  export let button;
+  } from "./userdata";
+  
+  import { googleChangeSignIn, loadAssignments } from "./assignments";
 
-  import { googleChangeSignIn, loadAssignments } from "./assignments.js";
+
+  /** Whether or not the modal window is shown. */
+  export let visible: boolean = false;
+  /** The window wrapper element. */
+  export let wrapper: HTMLDivElement;
+  /** An element which opens the settings window on click. */
+  export let button: HTMLElement;
+
+  /**
+   * Autofocus an element that uses the use: directive.
+   * Functionally equivalent to the `autofocus` attribute.
+   * @param el The element to focus.
+   */
 
   // This causes the window to scroll jump to the new bookmark while it's trying to do smooth scrolling, which is jarring.
-  const focus = (el) => {
+  const focus = (el: HTMLElement) => {
     el.focus();
   };
 </script>
