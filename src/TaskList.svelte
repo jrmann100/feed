@@ -2,16 +2,17 @@
   import { taskItems } from "./assignments";
   import Task from "./Task.svelte";
 
-  let wrapper;
-  let animated = false;
-  let loading = false;
+  let wrapper: HTMLDivElement;
+  let animated: boolean = false;
+  let loading: boolean = false;
 
+  // Animate the loading of new task items by masking and expanding the wrapper.
   // There should be a settings option to enable/disable this.
   $: if ($taskItems.length > 0 && wrapper) {
     animated = loading = true;
     wrapper.style.height =
       wrapper.querySelector(".content").getBoundingClientRect().height + "px";
-    setTimeout(() => (loading = false), 5000);
+    setTimeout(() => (loading = false), 800);
   }
 </script>
 
@@ -36,6 +37,9 @@
   }
 
   .mask {
+    /* Overflow is hidden when loading, so this is superfluous;
+     * it's mostly for Safari, which is slow to render that change. */
+    border-radius: inherit;
     position: absolute;
     background-color: var(--white);
     overflow: hidden;

@@ -1,23 +1,29 @@
 <script lang="ts">
   import { profileBookmarks, profileAliases, Link } from "./userdata";
-  let div: HTMLDivElement, content: string;
+  /** The current value of the omnibox. */
+  let content: string;
+  /** The message to display in the omnibox if there is an input error. */
   let error = "";
 
+  /** The search box. */
+  let input: HTMLInputElement;
+
+  /** Show the error text for three seconds. */
   export const showError = (text: string) => {
-    if (div) {
+    if (input) {
       error = text;
-      setTimeout(() => {
-        error = "";
-      }, 3000);
+      setTimeout(() => (error = ""), 3000);
     }
   };
 
+  /** Upon (external) activation, focus within the omnibox. */
   export const trigger = (ev: Event) => {
-    if (div) {
-      div.focus();
+    if (input) {
+      input.focus();
     }
   };
 
+  /** On returning a command (pressing enter). */
   const keydown = (ev: KeyboardEvent) => {
     if (ev.key == "Enter") {
       ev.preventDefault();
@@ -27,9 +33,11 @@
         showError("Enter a command in the format [link] [alias].");
         return;
       }
+      // First check that the bookmark exists...
       if (Object.keys($profileAliases).includes(command[1])) {
+        // ...then check that the link exists.
         let linkIndex = $profileBookmarks[$profileAliases[command[1]]].links
-          .map((link: Link) => link.name)
+          .map((link) => link.name)
           .indexOf(command[0]);
         if (linkIndex != -1) {
           window.open(
@@ -84,7 +92,7 @@
 
 <input
   type="text"
-  bind:this={div}
+  bind:this={input}
   class:error={error != ''}
   bind:value={content}
   on:keydown={keydown}

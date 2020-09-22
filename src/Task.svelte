@@ -1,7 +1,12 @@
 <script lang="ts">
-  export let item;
+  import type { Item } from "./assignments";
 
+  /** The Item to which this Task is bound. */
+  export let item: Item;
+
+  /** Show the time or date the task is due, depending on whether or not that date is today. */
   let dateString =
+    // The ms in 1 day.
     item.date.getTime() - new Date().getTime() > 86400000
       ? item.date.toString().split(" ")[0]
       : item.date.toLocaleTimeString([], {
@@ -10,7 +15,8 @@
           hour12: true,
         });
 
-  let expanded;
+  /** Whether or not this task is expanded to show more content. */
+  let expanded: boolean = false;
 </script>
 
 <style>
@@ -65,7 +71,7 @@
   .complete svg {
     display: block;
   }
-  
+
   .complete svg path {
     stroke: var(--black);
     stroke-width: 0.3;
@@ -84,19 +90,20 @@
     transform: rotate(90deg);
   }
 
-  .complete[completed="1"] {
+  .complete[data-completed="1"] {
     background-color: var(--black);
   }
 
-  .complete[completed="1"] svg path {
+  .complete[data-completed="1"] svg path {
     stroke: var(--white);
   }
 
-  .complete[completed="-1"] svg path, .complete[completed="1"] {
+  .complete[data-completed="-1"] svg path,
+  .complete[data-completed="1"] {
     stroke: var(--white);
   }
 
-  .complete[completed="-1"] {
+  .complete[data-completed="-1"] {
     border-color: lightsalmon;
     background-color: lightsalmon;
   }
@@ -121,10 +128,9 @@
   <div
     class="complete"
     on:click={() => (expanded = !expanded)}
-    completed={item.completed}>
-    <svg viewbox="0 0 2 2"><path
-        d="M 0.5,1 H 1.5" /><path
-        d="M 1,0.5 V 1.5" /></svg>
+    data-completed={item.completed}>
+    <svg viewBox="0 0 2 2"><path d="M 0.5,1 H 1.5" />
+      <path d="M 1,0.5 V 1.5" /></svg>
   </div>
   <a href={item.url} target="_blank"> {item.name} </a>
   <small>{dateString}</small>

@@ -1,39 +1,69 @@
-import { writable, derived } from 'svelte/store';
+/**
+ * Manage user data, including profile information and bookmarks.
+ * @module userdata
+ */
 
+import { writable, derived, Writable, Readable } from 'svelte/store';
+
+/** A default profile photo from Google. */
 const default_icon = "https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg";
 
-export const profileName = writable(localStorage.getItem("profileName") || "Signed Out");
-export const profileIcon = writable(localStorage.getItem("profileIcon" || default_icon));
-export const profileBookmarks = writable(JSON.parse(localStorage.getItem("profileBookmarks") || "[]"));
+/** Link, for use in a Bookmark. */
+export class Link {
+    /**
+     * A unique (per Bookmark) identifier for each link;
+     * it's encouraged to repeat names across bookmarks, i.e. an "agenda" for every class.
+     */
+    name: string;
+    /** The url for this Link. */
+    url: string;
+}
 
-export const profileCanvasURL = writable(localStorage.getItem("profileCanvasURL") || "");
+/** Bookmark, referenced by multiple aliases and providing access to Link destinations. */
+export class Bookmark {
+    /** A list of this Bookmark's Links. */
+    links: Link[];
+    /** A list of unique aliases by which this bookmark can be referenced. */
+    aliases: string[];
+}
 
+/** The Google account's profile name, synced to local storage. */
+export const profileName: Writable<string> = writable(localStorage.getItem("profileName") || "Signed Out");
+
+/** The Google account's profile photo, synced to local storage. */
+export const profileIcon: Writable<string> = writable(localStorage.getItem("profileIcon" || default_icon));
+
+/** The user's bookmarks, synced to local storage. */
+export const profileBookmarks: Writable<Bookmark[]> = writable(JSON.parse(localStorage.getItem("profileBookmarks") || "[]"));
+
+/** The Canvas calendar link (a .ics file) used to load assignments from that LMS. Synced to local storage. */
+export const profileCanvasURL: Writable<string> = writable(localStorage.getItem("profileCanvasURL") || "");
+
+/** Once signed out of Google, reset profile data to defualt. */
 export const profileGoogleSignout = () => {
     profileName.set("Signed out");
     profileIcon.set(default_icon);
 }
 
-export class Link {
-    name: string;
-    url: string;
-}
-
-export class Bookmark {
-    links: typeof Link[];
-    aliases: string[];
-}
-
+// Sync all profile data to local storage, preserving it after the page is unloaded.
 profileName.subscribe(value => localStorage.setItem("profileName", value));
 profileIcon.subscribe(value => localStorage.setItem("profileIcon", value));
 profileBookmarks.subscribe(value => localStorage.setItem("profileBookmarks", JSON.stringify(value)));
 profileCanvasURL.subscribe(value => localStorage.setItem("profileCanvasURL", value));
 
-// This makes it possible to check wich bookmark a given alias is bound to.
-export const profileAliases = derived(profileBookmarks, $profileBookmarks =>
-    // Convert a 2D array to a 1D array.
+/**
+ * A derived store of all profile aliases with their corresponding Bookmark's index in `$profileBookmarks`.
+ * 
+ * @example
+ * $profileBookmarks = {{aliases: ["a", "b"]}, {aliases: ["c"]}}
+ * // $profileAliases is now {a: 0, b: 0, c: 1}
+ * $profileBookmarks[$profileAliases["a"]]
+ * // Resolves to $profileBookmarks[0]
+*/
+export const profileAliases: Readable<[string, number]> = derived(profileBookmarks, $profileBookmarks =>
+    // Convert a 2D array of aliases[][] to a 1D array of [alias, bookmarkIndex][].
     [].concat(
-        // Turn every bookmark into a (key, value) pair matching 2D items with 1D parent indexes.
         ...$profileBookmarks.map((bookmark: Bookmark, bookmarkIndex: number) =>
             bookmark.aliases.map(alias => [alias, bookmarkIndex])))
-        // Convert (key, value) arrays into properties.
-        .reduce((acc, keyval) => acc = { ...acc, [keyval[0]]: keyval[1] }, {}))
+        // Convert [alias, bookmarkIndex] pairs into { alias: bookmarkIndex } properties.
+        .reduce((acc: [string, number][], keyval: [string, number]) => acc = { ...acc, [keyval[0]]: keyval[1] }, {}))
