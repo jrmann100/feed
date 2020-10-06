@@ -3,11 +3,11 @@
     profileBookmarks,
     profileAliases,
     profileCanvasURL,
-    profileName
+    profileName,
+    profilePreferredGoogleUser
   } from "./userdata";
-  
-  import { googleChangeSignIn, loadAssignments } from "./assignments";
 
+  import { googleChangeSignIn, loadAssignments } from "./assignments";
 
   /** Whether or not the modal window is shown. */
   export let visible: boolean = false;
@@ -22,9 +22,11 @@
    * @param el The element to focus.
    */
 
-  // This causes the window to scroll jump to the new bookmark while it's trying to do smooth scrolling, which is jarring.
+  let scrollLock = false;
   const focus = (el: HTMLElement) => {
-    el.focus();
+    if (!scrollLock) {
+      el.focus();
+    }
   };
 </script>
 
@@ -162,20 +164,35 @@
 <div class="wrapper" bind:this={wrapper} class:visible>
   <h1>Accounts</h1>
   <h2>Canvas Calendar URL</h2>
-  <input type="url" size="30" bind:value={$profileCanvasURL} on:change={loadAssignments} required />
+  <input
+    type="url"
+    size="30"
+    bind:value={$profileCanvasURL}
+    on:change={loadAssignments}
+    required />
   <h2>Google OAuth</h2>
-  <input type="button" value="{$profileName != "Signed out" ? "Sign out " + $profileName : "Sign in with Google"}" on:click={()=>{googleChangeSignIn(); loadAssignments();}}>
-  <hr><br><br>
+  <input
+    type="button"
+    value={$profileName != 'Signed out' ? 'Sign out ' + $profileName : 'Sign in with Google'}
+    on:click={() => {
+      googleChangeSignIn();
+    }} />
+    <br>
+    <label for="preferredGoogleUser">If you're signed into multiple Google accounts, this is the <pre>classroom.google.com/u/[number]/</pre> in the URL for Classroom.</label>
+    <input id="preferredGoogleUser" type="number" bind:value={$profilePreferredGoogleUser}>
+  <hr /><br /><br />
   <h1>Bookmarks</h1>
   <input
     type="button"
     value="Add Bookmark"
     on:click={(e) => {
+      scrollLock = true;
       $profileBookmarks = [...$profileBookmarks, { aliases: [''], links: [{ name: '', url: '' }] }];
       setTimeout(() => e.target.parentElement.scrollTo({
             top: e.target.parentElement.scrollHeight,
             behavior: 'smooth',
           }), 50);
+      setTimeout(() => (scrollLock = false), 50);
     }} />
   {#each $profileBookmarks as bookmark, bookmarkIndex}
     <hr />
@@ -254,7 +271,7 @@
         type="button"
         value="Delete Bookmark"
         on:click={() => ($profileBookmarks = [...$profileBookmarks.slice(0, bookmarkIndex), ...$profileBookmarks.slice(bookmarkIndex + 1)])} />
-        <!-- Add modules, like Zoom, here? Or auto-detect certain URLs? -->
+      <!-- Add modules, like Zoom, here? Or auto-detect certain URLs? -->
       <input type="submit" value="Validate" />
     </form>
   {/each}

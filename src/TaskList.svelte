@@ -8,12 +8,24 @@
 
   // Animate the loading of new task items by masking and expanding the wrapper.
   // There should be a settings option to enable/disable this.
-  $: if ($taskItems.length > 0 && wrapper) {
-    animated = loading = true;
-    wrapper.style.height =
-      wrapper.querySelector(".content").getBoundingClientRect().height + "px";
-    setTimeout(() => (loading = false), 800);
+  $: if ($taskItems.length > 0) {
+    animate();
   }
+  const animate = () => {
+    animated = loading = true;
+    wrapper.style.maxHeight = wrapper.style.height =
+      wrapper.querySelector(".content").getBoundingClientRect().height + "px";
+    setTimeout(() => {
+      loading = false;
+      wrapper.style.height =
+        wrapper.querySelector(".content").getBoundingClientRect().height + "px";
+      wrapper.style.maxHeight =
+        wrapper.querySelector(".content").getBoundingClientRect().height +
+        200 +
+        "px";
+      setTimeout(() => (wrapper.style.height = "auto"), 400);
+    }, 500);
+  };
 </script>
 
 <style>
@@ -24,10 +36,18 @@
     border-radius: 1.5rem;
     max-width: 90vw;
     background-color: var(--white);
-    transition: height 0.2s 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    transition: height 0.2s 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
     position: relative;
-    height: 5rem;
     box-shadow: var(--module-shadow);
+    max-height: 5rem;
+    height: 5rem;
+    overflow: hidden;
+    /* This is tricky. We want max-height and height to be equal while animating, but then shrink height back to its content size. */
+  }
+
+  .wrapper.animated.loading {
+    transition: max-height 0.2s 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+      height 0.2s 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -148,7 +168,8 @@
   bind:this={wrapper}>
   <div class="mask" />
   <div class="content">
-    {#each $taskItems as item}
+    <!-- As of now, only showing this week's assignments. -->
+    {#each $taskItems.filter((item) => item.date.getTime() - new Date().getTime() < 604800000) as item}
       <Task bind:item />
     {/each}
   </div>

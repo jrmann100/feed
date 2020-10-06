@@ -17,7 +17,7 @@
   };
 
   /** Upon (external) activation, focus within the omnibox. */
-  export const trigger = (ev: Event) => {
+  export const focus = (ev: Event) => {
     if (input) {
       input.focus();
     }

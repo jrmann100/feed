@@ -6,7 +6,8 @@
 import { writable, derived, Writable, Readable } from 'svelte/store';
 
 /** A default profile photo from Google. */
-const default_icon = "https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg";
+const default_icon: string = "https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg";
+const default_name: string = "Signed out";
 
 /** Link, for use in a Bookmark. */
 export class Link {
@@ -28,7 +29,7 @@ export class Bookmark {
 }
 
 /** The Google account's profile name, synced to local storage. */
-export const profileName: Writable<string> = writable(localStorage.getItem("profileName") || "Signed Out");
+export const profileName: Writable<string> = writable(localStorage.getItem("profileName") || default_name);
 
 /** The Google account's profile photo, synced to local storage. */
 export const profileIcon: Writable<string> = writable(localStorage.getItem("profileIcon" || default_icon));
@@ -39,9 +40,12 @@ export const profileBookmarks: Writable<Bookmark[]> = writable(JSON.parse(localS
 /** The Canvas calendar link (a .ics file) used to load assignments from that LMS. Synced to local storage. */
 export const profileCanvasURL: Writable<string> = writable(localStorage.getItem("profileCanvasURL") || "");
 
+/** The Canvas calendar link (a .ics file) used to load assignments from that LMS. Synced to local storage. */
+export const profilePreferredGoogleUser: Writable<string> = writable(localStorage.getItem("profilePreferredGoogleUser") || "0");
+
 /** Once signed out of Google, reset profile data to defualt. */
 export const profileGoogleSignout = () => {
-    profileName.set("Signed out");
+    profileName.set(default_name);
     profileIcon.set(default_icon);
 }
 
@@ -50,6 +54,7 @@ profileName.subscribe(value => localStorage.setItem("profileName", value));
 profileIcon.subscribe(value => localStorage.setItem("profileIcon", value));
 profileBookmarks.subscribe(value => localStorage.setItem("profileBookmarks", JSON.stringify(value)));
 profileCanvasURL.subscribe(value => localStorage.setItem("profileCanvasURL", value));
+profilePreferredGoogleUser.subscribe(value => localStorage.setItem("profilePreferredGoogleUser", value));
 
 /**
  * A derived store of all profile aliases with their corresponding Bookmark's index in `$profileBookmarks`.

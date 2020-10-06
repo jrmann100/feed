@@ -40,10 +40,13 @@
       padding-top 0.2s;
     max-height: 0;
     padding-top: 0;
+    overflow-y: scroll;
+    grid-column: 2 / 4;
+    margin: 0.5rem 0;
   }
 
   .wrapper.expanded .info {
-    max-height: 4rem;
+    max-height: 8rem;
     padding-top: 0.5rem;
     opacity: 1;
     visibility: visible;
@@ -134,5 +137,5 @@
   </div>
   <a href={item.url} target="_blank"> {item.name} </a>
   <small>{dateString}</small>
-  <div class="info">{item.className}</div>
+  <div class="info">{item.className}<br>{item.description}</div>
 </div>

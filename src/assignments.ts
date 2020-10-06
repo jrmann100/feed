@@ -7,7 +7,8 @@ import {
     profileName,
     profileIcon,
     profileGoogleSignout,
-    profileCanvasURL
+    profileCanvasURL,
+    profilePreferredGoogleUser
 } from "./userdata";
 
 import { get, writable, Writable } from 'svelte/store';
@@ -51,7 +52,7 @@ export class Item {
     constructor(name: string, className: string, description: string, url: string, date: Date, completed: 1 | 0 | -1 = -1) {
         this.name = name;
         this.className = className;
-        this.description = description;
+        this.description = description || "No description available.";
         this.url = url;
         this.date = date;
         this.completed = completed;
@@ -67,12 +68,9 @@ export class Item {
     }
 };
 
-/** Google API object, loaded from the Google library. */
-let gapi: any;
-
 /** Setup the Google Classroom API and login/logout callbacks. */
-const setupGAPI = () => {
-    gapi.client
+const setupGAPI = (): Promise<void> => {
+    return gapi.client
         .init({
             clientId:
                 "254795124493-hqrmlh9oqs85knd24o98c3644hmiqoc3.apps.googleusercontent.com",
@@ -85,37 +83,30 @@ const setupGAPI = () => {
                 "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
             ].join(" "),
         })
-        .then(
-            () => {
-                gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-                updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-            },
-            (error: any) => {
-                console.error(JSON.stringify(error, null, 2));
-            }
-        );
 };
 
 /** Update the user profile on Google sign-in status change. */
-const updateSigninStatus = (isSignedIn: boolean) => {
+const setupGoogleProfile = (isSignedIn: boolean = gapi.auth2.getAuthInstance().isSignedIn.get()) => {
     if (isSignedIn) {
         let profile = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile();
         if (profile.getName() != get(profileName)) {
             profileName.set(profile.getName());
             profileIcon.set(profile.getImageUrl());
         }
-
-        setupClassroom();
     } else {
         profileGoogleSignout();
     }
+    loadAssignments();
 }
 
 /** Sign in or out of Google, depending on the current status. */
-export const googleChangeSignIn = () => gapi.auth2.getAuthInstance().isSignedIn.get() ? gapi.auth2.getAuthInstance().signOut() : gapi.auth2.getAuthInstance().signIn();
+export const googleChangeSignIn = async () => {
+    await (gapi.auth2.getAuthInstance().isSignedIn.get() ? gapi.auth2.getAuthInstance().signOut() : gapi.auth2.getAuthInstance().signIn());
+    setupGoogleProfile();
+}
 
 /** Load assignments from the Google Classroom API. */
-const setupClassroom = async () => {
+const loadClassroomAssignments = async () => {
     // Get every course the student has ever enrolled in, then ignore all archived courses.
     const allCourses = await gapi.client.classroom.courses.list();
     const currCourses = allCourses.result.courses.filter(
@@ -169,7 +160,7 @@ const setupClassroom = async () => {
                     item.assignment.description,
                     item.assignment.alternateLink.replace(
                         "classroom.google.com/",
-                        "classroom.google.com/u/1/"
+                        "classroom.google.com/u/" + get(profilePreferredGoogleUser) + "/"
                     ),
                     item.assignment.dueDate
                         ? new Date(
@@ -197,7 +188,7 @@ const setupClassroom = async () => {
 };
 
 /** Load assignments from a Canvas personal calendar. */
-const setupICAL = async () => {
+const loadCanvasAssignments = async () => {
     /** ICAL library object, loaded from the library. */
     const ICAL: any = (window as any).ICAL;
     // Fetch the calendar through a proxy that will add CORS to our request.
@@ -259,8 +250,8 @@ const setupICAL = async () => {
             new Item(
                 (item.getFirstPropertyValue("summary").match(/.+?(?= \()/) ||
                     item.getFirstPropertyValue("summary").match(/.+?(?= \[)/))[0],
-                item.getFirstPropertyValue("summary").match(/\[([^\]]+)\]/)[0],
-                item.getFirstPropertyValue("description"),
+                item.getFirstPropertyValue("summary").match(/\[([^\]]+)\]/)[1],
+                "",
                 assembleCanvasURL(item.getFirstPropertyValue("url")),
                 item.getFirstPropertyValue("dtstart").toJSDate(),
                 new Date().getTime() >
@@ -285,12 +276,25 @@ const loadScript = (src: string) => {
     });
 };
 
-/** Load APIs and their respective assignments for all LMSes. */
+
+/** Google API object, loaded from the Google library. */
+let gapi: any;
+
+/** ICAL library object. */
+let ical: any;
+
+/** Load all LMS APIs and set up the user profile. */
+export const setupLMSes = async () => {
+    await Promise.all([loadScript("https://unpkg.com/ical.js@1.4.0/build/ical.js"), loadScript("https://apis.google.com/js/api:client.js")]);
+    ical = (window as any).ICAL;
+    gapi = (window as any).gapi;
+    await gapi.load("auth2", () => setupGAPI().then(() => setupGoogleProfile()));
+}
+
+/** Clear and refresh assignments from all LMSes. */
 export const loadAssignments = () => {
+    console.log("Loading assignments.");
     taskItems.set([]);
-    loadScript("https://unpkg.com/ical.js@1.4.0/build/ical.js").then(setupICAL);
-    loadScript("https://apis.google.com/js/api:client.js").then(() => {
-        gapi = (window as any).gapi; gapi.load("auth2", setupGAPI);
-    }
-    );
+    if (gapi.auth2.getAuthInstance().isSignedIn.get()) loadClassroomAssignments();
+    if (get(profileCanvasURL)) loadCanvasAssignments();
 }

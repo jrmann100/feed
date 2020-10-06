@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { loadAssignments } from "./assignments.js";
+  import { loadAssignments, setupLMSes } from "./assignments.js";
   import Omni from "./Omni.svelte";
   import Time from "./Time.svelte";
   import Settings from "./Settings.svelte";
@@ -11,14 +11,14 @@
   let menuVisible: boolean;
   let menuButton: HTMLDivElement;
 
-  onMount(loadAssignments);
+  onMount(() => setupLMSes().then(()=>loadAssignments));
 
-  let activateOmnibox: Function;
+  let omni: any;
 
   const handleKeydown = (ev: KeyboardEvent) => {
-    if (ev.key == "/" && activateOmnibox && !menuVisible) {
+    if (ev.key == "/" && !menuVisible) {
       ev.preventDefault();
-      activateOmnibox();
+      omni.focus();
     }
   };
 </script>
@@ -50,8 +50,7 @@
 <Settings bind:visible={menuVisible} bind:button={menuButton} />
 <br />
 <!-- Couldn't figure out how to add padding without stretching a body, so we've got a <br> -->
-<Omni bind:trigger={activateOmnibox} />
+<Omni bind:this={omni} />
 <Time />
 <TaskList />
-<br />
 <!-- There's some background glitch when the TaskList is at the very bottom. Should add a footer anyway. -->
