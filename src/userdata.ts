@@ -8,6 +8,8 @@ import { writable, derived, Writable, Readable } from 'svelte/store';
 /** A default profile photo from Google. */
 const default_icon: string = "https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg";
 const default_name: string = "Signed out";
+export const supportedColorSchemes = ["auto", "light", "dark"];
+
 
 /** Link, for use in a Bookmark. */
 export class Link {
@@ -43,6 +45,9 @@ export const profileCanvasURL: Writable<string> = writable(localStorage.getItem(
 /** The Canvas calendar link (a .ics file) used to load assignments from that LMS. Synced to local storage. */
 export const profilePreferredGoogleUser: Writable<string> = writable(localStorage.getItem("profilePreferredGoogleUser") || "0");
 
+/** */
+export const profilePreferredColorScheme: Writable<string> = writable(localStorage.getItem("profilePreferredColorScheme") || "auto");
+
 /** Once signed out of Google, reset profile data to defualt. */
 export const profileGoogleSignout = () => {
     profileName.set(default_name);
@@ -55,6 +60,7 @@ profileIcon.subscribe(value => localStorage.setItem("profileIcon", value));
 profileBookmarks.subscribe(value => localStorage.setItem("profileBookmarks", JSON.stringify(value)));
 profileCanvasURL.subscribe(value => localStorage.setItem("profileCanvasURL", value));
 profilePreferredGoogleUser.subscribe(value => localStorage.setItem("profilePreferredGoogleUser", value));
+profilePreferredColorScheme.subscribe(value => localStorage.setItem("profilePreferredColorScheme", value));
 
 /**
  * A derived store of all profile aliases with their corresponding Bookmark's index in `$profileBookmarks`.

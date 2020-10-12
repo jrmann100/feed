@@ -25,7 +25,7 @@
 
   /** On returning a command (pressing enter). */
   const keydown = (ev: KeyboardEvent) => {
-    if (ev.key == "Enter") {
+    if (ev.key === "Enter") {
       ev.preventDefault();
       let command = content.toLowerCase().split(" ");
       content = "";
@@ -55,13 +55,10 @@
 
 <style>
   input {
-    margin-top: 1rem;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+    height: auto;
     padding: 0.5rem;
     font-size: 1.5rem;
-    height: max-content;
+    height: 2rem;
     border-radius: 0.5rem;
     width: 30rem;
     max-width: 90vw;
@@ -69,6 +66,7 @@
     border: 0.2rem solid var(--whiter);
     color: var(--whiter);
     transition: background-color 0.2s;
+    min-width: 11.5rem;
   }
 
   input:focus {

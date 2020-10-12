@@ -4,7 +4,9 @@
     profileAliases,
     profileCanvasURL,
     profileName,
-    profilePreferredGoogleUser
+    profilePreferredGoogleUser,
+    profilePreferredColorScheme,
+    supportedColorSchemes,
   } from "./userdata";
 
   import { googleChangeSignIn, loadAssignments } from "./assignments";
@@ -16,6 +18,11 @@
   /** An element which opens the settings window on click. */
   export let button: HTMLElement;
 
+  let preferredColorSchemeIndex = supportedColorSchemes.indexOf(
+    $profilePreferredColorScheme
+  );
+
+  console.log(preferredColorSchemeIndex);
   /**
    * Autofocus an element that uses the use: directive.
    * Functionally equivalent to the `autofocus` attribute.
@@ -127,7 +134,9 @@
   input[type="submit"] {
     display: none;
   }
-  input {
+
+  input,
+  select {
     margin: 0.2rem;
     padding: 0.5rem;
     height: max-content;
@@ -136,6 +145,11 @@
     border: 0.1rem solid var(--black);
     color: var(--black);
     font-size: 0.8rem;
+  }
+
+  select {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
 
   input[type="button"] {
@@ -177,9 +191,20 @@
     on:click={() => {
       googleChangeSignIn();
     }} />
-    <br>
-    <label for="preferredGoogleUser">If you're signed into multiple Google accounts, this is the <pre>classroom.google.com/u/[number]/</pre> in the URL for Classroom.</label>
-    <input id="preferredGoogleUser" type="number" bind:value={$profilePreferredGoogleUser}>
+  <br />
+  <label for="preferredGoogleUser">If you're signed into multiple Google
+    accounts, this is the
+    <pre>classroom.google.com/u/[number]/</pre>
+    in the URL for Classroom.</label>
+  <input
+    id="preferredGoogleUser"
+    type="number"
+    bind:value={$profilePreferredGoogleUser} />
+  <br />
+  <select
+    bind:value={$profilePreferredColorScheme}>{#each supportedColorSchemes as colorScheme}
+      <option value={colorScheme}>{colorScheme}</option>
+    {/each}</select>
   <hr /><br /><br />
   <h1>Bookmarks</h1>
   <input

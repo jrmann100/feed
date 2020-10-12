@@ -22,13 +22,12 @@
 <style>
   .wrapper {
     height: max-content;
-    color: var(--black);
     padding: 0.5rem;
     border-bottom: var(--black) 0.1rem solid;
     box-sizing: border-box;
     font-size: 1.2rem;
     display: grid;
-    grid-template-columns: 10% 70% 20%;
+    grid-template-columns: 2rem 70% 20%;
     padding: 1rem 0.5rem;
   }
 
@@ -66,7 +65,6 @@
     border: 0.1rem solid var(--black);
     transition: background-color 0.2s;
     display: inline-block;
-    margin: 0 0.5rem;
     cursor: pointer;
     padding: 0.1rem;
   }

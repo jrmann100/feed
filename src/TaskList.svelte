@@ -34,7 +34,7 @@
     margin: 2rem auto;
     padding: 1.5rem;
     border-radius: 1.5rem;
-    max-width: 90vw;
+    max-width: 80vw;
     background-color: var(--white);
     transition: height 0.2s 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
     position: relative;
@@ -50,10 +50,8 @@
       height 0.2s 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   }
 
-  @media (prefers-color-scheme: dark) {
-    .wrapper {
-      border: 0.2rem solid var(--whiter);
-    }
+  :global(body.prefers-dark) .wrapper {
+    border: 0.2rem solid var(--whiter);
   }
 
   .mask {

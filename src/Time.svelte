@@ -6,15 +6,21 @@
 
   // Parse an updated dateTime into time (HHMM) and date (MMDD) text.
   $: time =
-    (dateTime.getHours() == 12 ? 12 : dateTime.getHours() % 12)
+    (dateTime.getHours() === 12 || dateTime.getHours() === 0
+      ? 12
+      : dateTime.getHours() % 12
+    )
       .toString()
-      .padStart(2, "0") + dateTime.getMinutes().toString().padStart(2, "0");
+      .padStart(2, "0") +
+    ":" +
+    dateTime.getMinutes().toString().padStart(2, "0");
   $: progress = dateTime.getMinutes() / 60;
   $: date =
     (dateTime.getMonth() + 1).toString().padStart(2, "0") +
+    "." +
     dateTime.getDate().toString().padStart(2, "0");
 
-  // Refresh the date every minute. 
+  // Refresh the date every minute.
   onMount(() => {
     const interval = setInterval(() => {
       dateTime = new Date();
@@ -54,11 +60,10 @@
     stroke: lightskyblue;
   }
 
-  @media (prefers-color-scheme: dark) {
-    svg.progress path:first-of-type {
-      stroke: darkslategray;
-    }
+  :global(body.prefers-dark) svg.progress path:first-of-type {
+    stroke: darkslategray;
   }
+
   svg.progress path:last-of-type {
     stroke-dasharray: 10;
     stroke-dashoffset: var(--progress-offset);

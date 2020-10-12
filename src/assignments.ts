@@ -149,13 +149,13 @@ const loadClassroomAssignments = async () => {
 
     // Convert every assignment/submission pair into an Item.
     classroomItems
-        .filter((item) => item.submission.state == "CREATED")
+        .filter((item) => item.submission.state === "CREATED")
         .forEach(
             (item) =>
                 new Item(
                     item.assignment.title,
                     currCourses.find(
-                        (course: any) => course.id == item.assignment.courseId
+                        (course: any) => course.id === item.assignment.courseId
                     ).name,
                     item.assignment.description,
                     item.assignment.alternateLink.replace(
