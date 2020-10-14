@@ -115,6 +115,7 @@
 
   .bookmark-del {
     grid-column: 1;
+    max-width: 8rem;
   }
 
   h2 {
@@ -150,6 +151,10 @@
   select {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+  }
+
+  input[type="button"].del:hover {
+    background-color: salmon;
   }
 
   input[type="button"] {
@@ -237,7 +242,7 @@
             e.target.setCustomValidity(Object.keys($profileAliases).includes(e.target.value) ? 'Alias must be unique.' : '');
             bookmark = bookmark;
           }} /><input
-          class="alias-del"
+          class="alias-del del"
           type="button"
           value="✖"
           on:click={(e) => {
@@ -275,7 +280,7 @@
           on:change={() => {
             bookmark = bookmark;
           }} /><input
-          class="link-del"
+          class="link-del del"
           type="button"
           value="✖"
           on:click={() => {
@@ -292,7 +297,7 @@
         }} />
       <input type="submit" value="Validate" />
       <input
-        class="bookmark-del"
+        class="bookmark-del del"
         type="button"
         value="Delete Bookmark"
         on:click={() => ($profileBookmarks = [...$profileBookmarks.slice(0, bookmarkIndex), ...$profileBookmarks.slice(bookmarkIndex + 1)])} />
