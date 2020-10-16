@@ -4,19 +4,14 @@
   /** The Item to which this Task is bound. */
   export let item: Item;
 
-  /** Show the time or date the task is due, depending on whether or not that date is today. */
-  let dateString =
-    // The ms in 1 day.
-    item.date.getTime() - new Date().getTime() > 86400000
-      ? item.date.toString().split(" ")[0]
-      : item.date.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        });
-
   /** Whether or not this task is expanded to show more content. */
   let expanded: boolean = false;
+
+  // This is kind of confusing, but components aren't actually bound to Items.
+  // Every other visible property is dynamically reloaded since they're in attributes,
+  // but all expanded Tasks need to be closed on a reload - unless we wanted to
+  // incorporate expansion into the Item class itself.
+  $: if (item) expanded = false;
 </script>
 
 <style>
@@ -58,19 +53,23 @@
 
   .complete {
     grid-column: 1;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 100%;
-    box-sizing: border-box;
-    border: 0.1rem solid var(--black);
-    transition: background-color 0.2s;
-    display: inline-block;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
     cursor: pointer;
-    padding: 0.1rem;
   }
 
   .complete svg {
+    /* box-sizing: border-box; */
+
     display: block;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 0.1rem solid var(--black);
+    border-radius: 100%;
+    transition: background-color 0.2s;
+    /* padding: 0.1rem; */
   }
 
   .complete svg path {
@@ -91,7 +90,7 @@
     transform: rotate(90deg);
   }
 
-  .complete[data-completed="1"] {
+  .complete[data-completed="1"] svg {
     background-color: var(--black);
   }
 
@@ -104,7 +103,7 @@
     stroke: var(--white);
   }
 
-  .complete[data-completed="-1"] {
+  .complete[data-completed="-1"] svg {
     border-color: lightsalmon;
     background-color: lightsalmon;
   }
@@ -134,6 +133,14 @@
       <path d="M 1,0.5 V 1.5" /></svg>
   </div>
   <a href={item.url} target="_blank"> {item.name} </a>
-  <small>{dateString}</small>
-  <div class="info">{item.className}<br>{item.description}</div>
+  <small>{item.date.getTime() - new Date().getTime() > 86400000 ? item.date
+          .toString()
+          .split(
+            ' '
+          )[0] : item.date.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        })}</small>
+  <div class="info">{item.className}<br />{item.description}</div>
 </div>

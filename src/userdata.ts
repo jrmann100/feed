@@ -78,3 +78,14 @@ export const profileAliases: Readable<[string, number]> = derived(profileBookmar
             bookmark.aliases.map(alias => [alias, bookmarkIndex])))
         // Convert [alias, bookmarkIndex] pairs into { alias: bookmarkIndex } properties.
         .reduce((acc: [string, number][], keyval: [string, number]) => acc = { ...acc, [keyval[0]]: keyval[1] }, {}))
+
+/**
+ * A derived store of all link names `$profileBookmark.link.name`.
+ */
+export const profileLinkNames: Readable<string[]> = derived(profileBookmarks, $profileBookmarks =>
+    // Convert a 2D array of links[][] to a 1D array of link names.
+    [].concat(
+        ...$profileBookmarks.map((bookmark: Bookmark) =>
+            bookmark.links.map(link => link.name)))
+        // Filter out duplicate links.
+        .filter((name, i, names) => names.indexOf(name) == i))

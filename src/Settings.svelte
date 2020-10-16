@@ -7,6 +7,7 @@
     profilePreferredGoogleUser,
     profilePreferredColorScheme,
     supportedColorSchemes,
+    profileLinkNames,
   } from "./userdata";
 
   import { googleChangeSignIn, loadAssignments } from "./assignments";
@@ -22,7 +23,6 @@
     $profilePreferredColorScheme
   );
 
-  console.log(preferredColorSchemeIndex);
   /**
    * Autofocus an element that uses the use: directive.
    * Functionally equivalent to the `autofocus` attribute.
@@ -83,6 +83,16 @@
   .bookmark-title {
     max-width: 60vw;
     margin: auto;
+  }
+
+  .alias-text,
+  .bookmark-title {
+    text-transform: lowercase;
+  }
+
+  .alias-error {
+    color: lightcoral;
+    grid-column: 1 / 2;
   }
 
   .alias-text {
@@ -224,6 +234,11 @@
           }), 50);
       setTimeout(() => (scrollLock = false), 50);
     }} />
+  <datalist id="linkNames">
+    {#each $profileLinkNames as name}
+      <option value={name} />
+    {/each}
+  </datalist>
   {#each $profileBookmarks as bookmark, bookmarkIndex}
     <hr />
     <h1 class="bookmark-title">{'Bookmark ' + (bookmarkIndex + 1)}</h1>
@@ -239,6 +254,7 @@
           use:focus
           bind:value={alias}
           on:change={(e) => {
+            e.target.value = e.target.value.toLowerCase();
             e.target.setCustomValidity(Object.keys($profileAliases).includes(e.target.value) ? 'Alias must be unique.' : '');
             bookmark = bookmark;
           }} /><input
@@ -260,13 +276,20 @@
       <h2>Links</h2>
       {#each bookmark.links as link, linkIndex}
         <input
+          list="linkNames"
           class="link-name"
           size="8"
           placeholder="Fill out this link name."
           type="text"
           required
           bind:value={link.name}
-          on:change={() => {
+          on:change={(e) => {
+            e.target.value = e.target.value.toLowerCase();
+            e.target.setCustomValidity(bookmark.links
+                .map((link) => link.name)
+                .indexOf(
+                  e.target.value
+                ) !== linkIndex ? 'Link name must be unique.' : '');
             bookmark = bookmark;
           }} />
         <input
