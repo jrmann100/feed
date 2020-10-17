@@ -13,17 +13,17 @@
     
     "icons": [
       {
-        "src": "/static/icon-16.png",
+        "src": "static/icon-16.png",
         "type": "image/png",
         "sizes": "16x16"
       },
       {
-        "src": "/static/icon-32.png",
+        "src": "static/icon-32.png",
         "type": "image/png",
         "sizes": "32x32"
       },
       {
-        "src": "/static/icon-192.png",
+        "src": "static/icon-192.png",
         "type": "image/png",
         "sizes": "192x192"
       }
