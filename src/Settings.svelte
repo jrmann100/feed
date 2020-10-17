@@ -90,11 +90,6 @@
     text-transform: lowercase;
   }
 
-  .alias-error {
-    color: lightcoral;
-    grid-column: 1 / 2;
-  }
-
   .alias-text {
     grid-column: 1 / 2;
   }
