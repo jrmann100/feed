@@ -9,7 +9,6 @@
     "orientation": "portrait",
     "categories": ["education", "productivity"],
     "lang": "en-US",
-    "scope": ".",
     
     "icons": [
       {
