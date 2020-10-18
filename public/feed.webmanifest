@@ -2,11 +2,10 @@
     "name": "Feed",
     "short_name": "Feed",
     "description": "A productivity app for students.",
-    "display": "minimal-ui",
+    "display": "standalone",
     "start_url": "./index.html",
     "background_color": "#4169e1",
     "theme_color": "#4169e1",
-    "orientation": "portrait",
     "categories": ["education", "productivity"],
     "lang": "en-US",
     

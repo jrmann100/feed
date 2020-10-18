@@ -15,9 +15,9 @@
   /** Whether or not the modal window is shown. */
   export let visible: boolean = false;
   /** The window wrapper element. */
-  export let wrapper: HTMLDivElement;
+  export let wrapper: HTMLDivElement = undefined;
   /** An element which opens the settings window on click. */
-  export let button: HTMLElement;
+  export let button: HTMLElement = undefined;
 
   let preferredColorSchemeIndex = supportedColorSchemes.indexOf(
     $profilePreferredColorScheme

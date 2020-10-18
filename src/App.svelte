@@ -71,12 +71,18 @@
     border: 0.2rem solid var(--whiter);
     cursor: pointer;
   }
+
+    /* Safari doesn't support the gap property. */
+    @supports (-webkit-touch-callout: none) {
+    .menu-button {
+      margin-left: 0.5rem;
+    }
+  }
 </style>
 
 <svelte:body on:keydown={handleKeydown} />
-<Settings bind:visible={menuVisible} bind:button={menuButton} />
-<br />
 <!-- Couldn't figure out how to add padding without stretching a body, so we've got a <br> -->
+<br />
 <div class="header">
   <!-- We have this as a spacer in the flexbox, so that the omnibox will be space-between'ed to the center -->
   <div class="spacer" />
@@ -88,6 +94,7 @@
     style="--profile-icon:url({$profileIcon})"
     alt={$profileName} />
 </div>
+<Settings bind:visible={menuVisible} bind:button={menuButton} />
 <Time />
 <TaskList />
 <!-- There's some background glitch when the TaskList is at the very bottom. Should add a footer anyway. -->
