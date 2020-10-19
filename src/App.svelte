@@ -5,6 +5,7 @@
   import Time from "./Time.svelte";
   import Settings from "./Settings.svelte";
   import TaskList from "./TaskList.svelte";
+  import A2HS from "./A2HS.svelte";
 
   import {
     profileName,
@@ -54,16 +55,9 @@
     gap: 0.5rem;
   }
 
-  .header .spacer {
-    max-width: 3rem;
-    width: 100%;
-    flex-shrink: 100;
-  }
-
   .menu-button {
     min-width: 3rem;
     min-height: 3rem;
-    float: right;
     background-color: var(--white);
     background-image: var(--profile-icon);
     background-size: contain;
@@ -72,8 +66,8 @@
     cursor: pointer;
   }
 
-    /* Safari doesn't support the gap property. */
-    @supports (-webkit-touch-callout: none) {
+  /* Safari doesn't support the gap property. */
+  @supports (-webkit-touch-callout: none) {
     .menu-button {
       margin-left: 0.5rem;
     }
@@ -85,7 +79,7 @@
 <br />
 <div class="header">
   <!-- We have this as a spacer in the flexbox, so that the omnibox will be space-between'ed to the center -->
-  <div class="spacer" />
+  <A2HS />
   <Omni bind:this={omni} />
   <div
     class="menu-button"
