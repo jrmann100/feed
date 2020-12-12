@@ -134,7 +134,7 @@
   }
 
   .wrapper {
-    overflow: scroll;
+    overflow: auto;
     /* Should this scroll, or expand to fit content? */
   }
 

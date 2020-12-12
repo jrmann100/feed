@@ -70,7 +70,6 @@
 
 <style>
     .wrapper {
-        max-width: 0;
         flex-shrink: 100;
         transition: opacity 0.2s, border-width 0.2s, min-width 0.5s,
             max-width 0.5s, flex-shrink 0.5s;

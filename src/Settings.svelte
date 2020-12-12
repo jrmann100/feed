@@ -8,9 +8,11 @@
     profilePreferredColorScheme,
     supportedColorSchemes,
     profileLinkNames,
+    Bookmark,
   } from "./userdata";
 
   import { googleChangeSignIn, loadAssignments } from "./assignments";
+  import SettingsCard from "./SettingsCard.svelte";
 
   /** Whether or not the modal window is shown. */
   export let visible: boolean = false;
@@ -18,6 +20,8 @@
   export let wrapper: HTMLDivElement = undefined;
   /** An element which opens the settings window on click. */
   export let button: HTMLElement = undefined;
+
+  export let masked: boolean = false;
 
   let preferredColorSchemeIndex = supportedColorSchemes.indexOf(
     $profilePreferredColorScheme
@@ -69,6 +73,10 @@
     visibility: visible;
   }
 
+  .wrapper.masked {
+    overflow: hidden;
+  }
+
   .bookmark-form,
   input {
     display: grid;
@@ -85,8 +93,7 @@
     margin: auto;
   }
 
-  .alias-text,
-  .bookmark-title {
+  .alias-text {
     text-transform: lowercase;
   }
 
@@ -172,20 +179,34 @@
     color: var(--whiter);
   }
 
-  hr {
-    margin-top: 3rem;
-    margin-bottom: 2rem;
+  .card-wrapper {
+    display: flex;
+    flex-wrap: wrap;
   }
 </style>
 
+<!-- https://github.com/sveltejs/svelte/issues/3105 -->
+<svelte:head>
+  {#if visible}
+    <style>
+      body {
+        overflow: hidden;
+      }
+    </style>
+  {/if}
+</svelte:head>
+
 <svelte:body
+  on:keyup={(e) => {
+    if (visible && !masked && e.key === 'Escape') visible = false;
+  }}
   on:click={(e) => {
     setTimeout(() => {
       // We need to check that body.contains(e.target) in case we've just deleted a settings option.
       if (visible && !wrapper.contains(e.target) && !button.contains(e.target) && document.body.contains(e.target)) visible = false;
     }, 100);
   }} />
-<div class="wrapper" bind:this={wrapper} class:visible>
+<div class="wrapper" bind:this={wrapper} class:visible class:masked>
   <h1>Accounts</h1>
   <h2>Canvas Calendar URL</h2>
   <input
@@ -215,7 +236,8 @@
     bind:value={$profilePreferredColorScheme}>{#each supportedColorSchemes as colorScheme}
       <option value={colorScheme}>{colorScheme}</option>
     {/each}</select>
-  <hr /><br /><br />
+  <br />
+  <hr />
   <h1>Bookmarks</h1>
   <input
     type="button"
@@ -234,93 +256,96 @@
       <option value={name} />
     {/each}
   </datalist>
-  {#each $profileBookmarks as bookmark, bookmarkIndex}
-    <hr />
-    <h1 class="bookmark-title">{'Bookmark ' + (bookmarkIndex + 1)}</h1>
-    <form class="bookmark-form" action="#">
-      <h2>Aliases</h2>
-      {#each bookmark.aliases as alias, aliasIndex}
-        <input
-          class="alias-text"
-          size="8"
-          placeholder="Fill out alias."
-          type="text"
-          required
-          use:focus
-          bind:value={alias}
-          on:change={(e) => {
-            e.target.value = e.target.value.toLowerCase();
-            e.target.setCustomValidity(Object.keys($profileAliases).includes(e.target.value) ? 'Alias must be unique.' : '');
-            bookmark = bookmark;
-          }} /><input
-          class="alias-del del"
-          type="button"
-          value="✖"
-          on:click={(e) => {
-            bookmark.aliases = [...bookmark.aliases.slice(0, aliasIndex), ...bookmark.aliases.slice(aliasIndex + 1)];
-            bookmark = bookmark;
-          }} />
-      {/each}
-      <input
-        class="alias-add"
-        type="button"
-        value="Add Alias"
-        on:click={() => {
-          bookmark.aliases = [...bookmark.aliases, ''];
-        }} />
-      <h2>Links</h2>
-      {#each bookmark.links as link, linkIndex}
-        <input
-          list="linkNames"
-          class="link-name"
-          size="8"
-          placeholder="Fill out this link name."
-          type="text"
-          required
-          bind:value={link.name}
-          on:change={(e) => {
-            e.target.value = e.target.value.toLowerCase();
-            e.target.setCustomValidity(bookmark.links
-                .map((link) => link.name)
-                .indexOf(
-                  e.target.value
-                ) !== linkIndex ? 'Link name must be unique.' : '');
-            bookmark = bookmark;
-          }} />
-        <input
-          class="link-url"
-          size="16"
-          placeholder="Fill out this link URL."
-          type="url"
-          required
-          use:focus
-          bind:value={link.url}
-          on:change={() => {
-            bookmark = bookmark;
-          }} /><input
-          class="link-del del"
-          type="button"
-          value="✖"
-          on:click={() => {
-            bookmark.links = [...bookmark.links.slice(0, linkIndex), ...bookmark.links.slice(linkIndex + 1)];
-            bookmark = bookmark;
-          }} />
-      {/each}
-      <input
-        class="link-add"
-        type="button"
-        value="Add Link"
-        on:click={() => {
-          bookmark.links = [...bookmark.links, { name: '', url: '' }];
-        }} />
-      <input type="submit" value="Validate" />
-      <input
-        class="bookmark-del del"
-        type="button"
-        value="Delete Bookmark"
-        on:click={() => ($profileBookmarks = [...$profileBookmarks.slice(0, bookmarkIndex), ...$profileBookmarks.slice(bookmarkIndex + 1)])} />
-      <!-- Add modules, like Zoom, here? Or auto-detect certain URLs? -->
-      <input type="submit" value="Validate" />
-    </form>
-  {/each}
+  <div class="card-wrapper">
+    {#each $profileBookmarks as bookmark, bookmarkIndex}
+      <SettingsCard bind:masked name={'Bookmark ' + (bookmarkIndex + 1)}>
+        <h1 class="bookmark-title">{'Bookmark ' + (bookmarkIndex + 1)}</h1>
+        <form class="bookmark-form" action="#">
+          <h2>Aliases</h2>
+          {#each bookmark.aliases as alias, aliasIndex}
+            <input
+              class="alias-text"
+              size="8"
+              placeholder="Fill out alias."
+              type="text"
+              required
+              use:focus
+              bind:value={alias}
+              on:change={(e) => {
+                e.target.value = e.target.value.toLowerCase();
+                e.target.setCustomValidity(Object.keys($profileAliases).includes(e.target.value) ? 'Alias must be unique.' : '');
+                bookmark = bookmark;
+              }} /><input
+              class="alias-del del"
+              type="button"
+              value="✖"
+              on:click={(e) => {
+                bookmark.aliases = [...bookmark.aliases.slice(0, aliasIndex), ...bookmark.aliases.slice(aliasIndex + 1)];
+                bookmark = bookmark;
+              }} />
+          {/each}
+          <input
+            class="alias-add"
+            type="button"
+            value="Add Alias"
+            on:click={() => {
+              bookmark.aliases = [...bookmark.aliases, ''];
+            }} />
+          <h2>Links</h2>
+          {#each bookmark.links as link, linkIndex}
+            <input
+              list="linkNames"
+              class="link-name"
+              size="8"
+              placeholder="Fill out this link name."
+              type="text"
+              required
+              bind:value={link.name}
+              on:change={(e) => {
+                e.target.value = e.target.value.toLowerCase();
+                e.target.setCustomValidity(bookmark.links
+                    .map((link) => link.name)
+                    .indexOf(
+                      e.target.value
+                    ) !== linkIndex ? 'Link name must be unique.' : '');
+                bookmark = bookmark;
+              }} />
+            <input
+              class="link-url"
+              size="16"
+              placeholder="Fill out this link URL."
+              type="url"
+              required
+              use:focus
+              bind:value={link.url}
+              on:change={() => {
+                bookmark = bookmark;
+              }} /><input
+              class="link-del del"
+              type="button"
+              value="✖"
+              on:click={() => {
+                bookmark.links = [...bookmark.links.slice(0, linkIndex), ...bookmark.links.slice(linkIndex + 1)];
+                bookmark = bookmark;
+              }} />
+          {/each}
+          <input
+            class="link-add"
+            type="button"
+            value="Add Link"
+            on:click={() => {
+              bookmark.links = [...bookmark.links, { name: '', url: '' }];
+            }} />
+          <input type="submit" value="Validate" />
+          <input
+            class="bookmark-del del"
+            type="button"
+            value="Delete Bookmark"
+            on:click={() => ($profileBookmarks = [...$profileBookmarks.slice(0, bookmarkIndex), ...$profileBookmarks.slice(bookmarkIndex + 1)])} />
+          <!-- Add modules, like Zoom, here? Or auto-detect certain URLs? -->
+          <input type="submit" value="Validate" />
+        </form>
+      </SettingsCard>
+    {/each}
+  </div>
 </div>
