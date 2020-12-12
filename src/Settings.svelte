@@ -258,8 +258,8 @@
   </datalist>
   <div class="card-wrapper">
     {#each $profileBookmarks as bookmark, bookmarkIndex}
-      <SettingsCard bind:masked name={'Bookmark ' + (bookmarkIndex + 1)}>
-        <h1 class="bookmark-title">{'Bookmark ' + (bookmarkIndex + 1)}</h1>
+      <SettingsCard bind:masked name={bookmark.aliases[0]}>
+        <h1 class="bookmark-title">{bookmark.aliases[0]}</h1>
         <form class="bookmark-form" action="#">
           <h2>Aliases</h2>
           {#each bookmark.aliases as alias, aliasIndex}

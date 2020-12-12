@@ -13,8 +13,8 @@
     border-radius: 0.5rem;
     transition: z-index 0s 0.3s;
     position: relative;
-    height: 12rem;
-    width: 8rem;
+    height: 6rem;
+    width: 5rem;
     overflow: visible;
     margin: 1rem;
     display: inline-block;
@@ -23,8 +23,8 @@
     cursor: pointer;
   }
 
-  :global(body.prefers-dark) .card::before {
-    border: 0.1rem solid var(--black);
+  /* :global(body.prefers-dark) */ .card::before {
+    border: 0.08rem solid var(--black);
   }
 
   .card::before {
@@ -55,10 +55,15 @@
   }
 
   .card .min-content {
-    margin: 10% auto 0 auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
     max-width: max-content;
     opacity: 1;
     visibility: visible;
+    pointer-events: none;
     transition: opacity 0.2s 0.2s, visibility 0s;
   }
 
